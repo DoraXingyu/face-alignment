@@ -6,25 +6,25 @@
 % Configure the parameters for training model
 global params;
 config_te;
-
+dbnames = {'test'}
 if size(dbnames) > 1 & sum(strcmp(dbnames, 'COFW')) > 0
     disp('Sorry, COFW cannnot be combined with others')
     return;
 end
 
 if sum(strcmp(dbnames, 'COFW')) > 0
-    load('..\initial_shape\InitialShape_29.mat');
+    load('../initial_shape/InitialShape_29.mat');
     params.meanshape        = S0;
 else
-    load('..\initial_shape\InitialShape_68.mat');
+    load('../initial_shape/InitialShape_68.mat');
     params.meanshape        = S0;
 end
 
 if params.isparallel
-    if isempty(gcp('nocreate')) %判断并行计算环境是否已然启动
-        parpool(4); %若尚未启动，则启动并行环境
+    if isempty(gcp('nocreate')) 
+        parpool(4); 
     else
-        disp('Already initialized'); %说明并行环境已经启动。
+        disp('Already initialized'); 
     end
 end
 
@@ -32,7 +32,7 @@ end
 Te_Data = [];
 for i = 1:length(dbnames)
     % load training samples (including training images, and groundtruth shapes)
-    imgpathlistfile = strcat('D:\Projects_Face_Detection\Datasets\', dbnames{i}, '\Path_Images.txt');
+    imgpathlistfile = strcat('../datasets/', dbnames{i}, '/Path_Images.txt');
     te_data = loadsamples(imgpathlistfile, 1);
     Te_Data = [Te_Data; te_data];
 end
@@ -40,7 +40,7 @@ end
 
 % Augmentate data for traing: assign multiple initial shapes to each image
 
-Data = Te_Data;
+Data = [Te_Data];
 Param = params;
 
 if Param.flipflag % if conduct flipping
@@ -175,7 +175,8 @@ dbname_str = dbname_str(1:end-1);
 if ~exist(dbname_str,'dir')
    mkdir(dbname_str);
 end
-    
+
+FacePt = []; 
 for s = 1:params.max_numstage
     % derive binary codes given learned random forest in current stage
     
@@ -193,8 +194,20 @@ for s = 1:params.max_numstage
     tic;
     disp('predict landmark locations...');
 
-    Data = globalprediction(binfeatures, Ws{min(s,  params.max_numstage)}, Data, Param, min(s,  params.max_numstage));        
+    [FacePt, Data ] = globalprediction(binfeatures, Ws{min(s,  params.max_numstage)}, Data, Param, min(s,  params.max_numstage));        
     % Data = globalprediction(binfeatures, TrModel{s}.W, Data, Param, min(s,  params.max_numstage));        
     toc;        
     
+end
+
+for i = 1 : dbsize
+    filename = Te_Data{i}.filename(1:end-4);
+    save(strcat(filename,'.mat'),'predshapes');
+    figure;
+    imshow(Te_Data{i}.img_gray);
+    hold on;
+    for j = 1 : size(FacePt,1)
+        plot(FacePt(j,1,i),FacePt(j,2,i),'r.','MarkerSize',20)
+    end
+    drawnow;
 end

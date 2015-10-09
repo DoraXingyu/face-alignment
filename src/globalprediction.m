@@ -1,4 +1,4 @@
-function Te_Data = globalprediction(binaryfeatures, W, Te_Data, params, stage)
+function [FacePt, Te_Data] = globalprediction(binaryfeatures, W, Te_Data, params, stage)
 %GLOBALREGRESSION Summary of this function goes here
 %   Function: implement global regression given binary features and
 %   groundtruth shape
@@ -11,6 +11,7 @@ function Te_Data = globalprediction(binaryfeatures, W, Te_Data, params, stage)
 %        W: regression matrix
 
 % organize the groundtruth shape
+FacePt = [];
 dbsize      = length(Te_Data);
 gtshapes = zeros([size(params.meanshape) dbsize*(params.augnumber)]);  % concatenate 2-D coordinates into a vector (N X (2*L))
 dist_pupils = zeros(dbsize*(params.augnumber), 1);
@@ -81,13 +82,18 @@ for i = 1:dbsize*(params.augnumber)
     %}
 end
 
-error_per_image = compute_error(gtshapes, predshapes);
+FacePt = [FacePt, predshapes];   
 
-MRSE = 100*mean(error_per_image);
-MRSE_display = sprintf('Mean Root Square Error for %d Test Samples: %f', (dbsize*(params.augnumber)), MRSE);
-disp(MRSE_display);
+%==============================Below used for evaluating the error
+%error_per_image = compute_error(gtshapes, predshapes);
+
+%MRSE = 100*mean(error_per_image);
+%MRSE_display = sprintf('Mean Root Square Error for %d Test Samples: %f', (dbsize*(params.augnumber)), MRSE);
+%disp(MRSE_display);
 
 end
+
+
 
 function [ error_per_image ] = compute_error( ground_truth_all, detected_points_all )
 %compute_error

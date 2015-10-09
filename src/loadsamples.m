@@ -23,7 +23,7 @@ parfor i = 1:length(imgpathlist)
     img = im2uint8(imread(imgpathlist{i}));
     Data{i}.width_orig    = size(img, 2);
     Data{i}.height_orig   = size(img, 1);
-    
+    Data{i}.filename = imgpathlist{i};
     % Data{i}.img      = img
     % shapepath = strrep(imgpathlist{i}, 'png', 'pts');
     shapepath = strcat(imgpathlist{i}(1:end-3), 'pts');

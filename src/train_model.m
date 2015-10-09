@@ -8,6 +8,7 @@ global params;
 global Tr_Data;
 config_tr;
 
+dbnames = {'afw'}
 if size(dbnames) > 1 & sum(strcmp(dbnames, 'COFW')) > 0
     disp('Sorry, COFW cannnot be combined with others')
     return;
@@ -45,7 +46,7 @@ Tr_Data    = [];
 % Tr_Bboxes  = [];
 for i = 1:length(dbnames)
     % load training samples (including training images, and groundtruth shapes)
-    imgpathlistfile = strcat('..\datasets\', dbnames{i}, '\Path_Images.txt');
+    imgpathlistfile = strcat('../datasets/', dbnames{i}, '/Path_Images.txt');
     tr_data = loadsamples(imgpathlistfile, 2);
     Tr_Data = [Tr_Data; tr_data];
 end
