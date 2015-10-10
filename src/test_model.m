@@ -202,7 +202,6 @@ end
 
 for i = 1 : dbsize
     filename = Te_Data{i}.filename(1:end-4);
-    save(strcat(filename,'.mat'),'predshapes');
     figure;
     imshow(Te_Data{i}.img_gray);
     hold on;
