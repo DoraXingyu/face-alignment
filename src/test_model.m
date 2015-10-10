@@ -161,7 +161,7 @@ for i = 1:dbsize
 end
 
 % test random forests
-% load('LBFRegModel_afw_lfpw.mat');
+ load('LBFRegModel_best.mat');
 
 randf = LBFRegModel.ranf;
 Ws    = LBFRegModel.Ws;
